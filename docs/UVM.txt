@@ -1,0 +1,60 @@
+The Universal Verification Methodology (UVM) is a standardized methodology for verifying integrated circuit designs. UVM is derived mainly from the OVM (Open Verification Methodology) which was, to a large part, based on the eRM (e Reuse Methodology) for the e Verification Language developed by Verisity Design in 2001. The UVM class library brings much automation to the SystemVerilog language such as sequences and data automation features (packing, copy, compare) etc., and unlike the previous methodologies developed independently by the simulator vendors, is an Accellera standard with support from multiple vendors: Aldec, Cadence, Mentor Graphics, Synopsys, Xilinx Simulator(XSIM).
+
+History
+In December 2009, a technical subcommittee of Accellera — a standards organization in the electronic design automation (EDA) industry — voted to establish the UVM and decided to base this new standard on the Open Verification Methodology (OVM-2.1.1),[1] a verification methodology developed jointly in 2007 by Cadence Design Systems and Mentor Graphics.
+
+On February 21, 2011, Accellera approved the 1.0 version of UVM.[2] UVM 1.0 includes a Reference Guide, a Reference Implementation in the form of a SystemVerilog base class library, and a User Guide.[2]
+
+Factory
+A factory is a commonly-used concept in object-oriented programming. It is an object that is used for instantiating other objects. There are two ways to register an object with the UVM factory. In the declaration of class A, one can invoke the `uvm_object_utils(A) or `uvm_component_utils(A) registration macros. Otherwise, the `uvm_object_registry(A,B) or `uvm_component_registry(A,B) macros can be used to map a string B to a class type A.[3] The UVM factory provides a variety of create methods that allow the user to instantiate an object with a particular instance name and of a registered type.[4]
+
+Sequencer
+The sequencer is responsible for three main functions:
+
+Put the DUV (Design Under Verification) and the verification environment into an initialization state
+Configuring the verification environment and DUV
+The entire DUV scenario generation
+Initialization
+In this stage the DUT (Device Under Test) and the environment it is in should be set to the conditions desired before the simulation. Likely, this includes:
+
+Loading memory, with any type of needed initial conditions
+Pin settings on the DUT, such as power and high impedance
+Register settings that can not be altered during simulation such as mode bits or if part of the environment reg
+Verification component settings that can not be altered during simulation
+Scoreboard
+Description
+A scoreboard can be implemented in various ways. Generally speaking, a scoreboard takes the inputs to and outputs from the DUT, determines what the input-output relationship should be, and judges whether the DUT adheres to the specification. This input-output relationship is often specified by a model, called a predictor.[5] The predictor may be implemented in a higher-level programming language, like SystemC.
+
+Implementation Details
+UVM scoreboard classes are implemented as subclasses of the uvm_scoreboard class, which itself is a subclass of uvm_component. uvm_scoreboard is a blank slate for implementing a scoreboard. It only contains one class method, namely the "new" constructor method. The rest of the implementation is user-defined.[6]
+
+Agent
+Description
+In modern VLSI, a DUT may have multiple interfaces. Each of these interfaces may have different UVM objects associated with them. For instance, if the DUT is the full-chip, there may be separate interfaces for PCI, Ethernet, and other communication standards. The scoreboard and monitor for a PCI interface will be different from the ones for the Ethernet interface. The various UVM objects can be organized as members of a wrapper class known as an agent. Passive agents will only analyze port values of the interface and should contain a monitor member. Active agents will drive ports and should contain a driver member, perhaps in addition to a monitor member.[7]
+
+Implementation Details
+UVM agent classes are implemented as subclasses of the uvm_agent class, which itself is a subclass of uvm_component. Much like uvm_scoreboard, uvm_agent is lightweight in terms of class methods. Its only class methods are the "new" constructor and the "get_is_active" method. If the agent is being used to drive ports, get_is_active returns UVM_ACTIVE. Otherwise, get_is_active returns UVM_PASSIVE.
+
+Driver
+Description
+Sequence items for a test are described abstractly. For example, if the DUT is a register file, it may have ports for a read address and a write address. The sequence item object may have member variables for the read address and the write address. However, these values need to eventually become bits at the input pins to the DUT.[8] There may even be an exotic encoding used when providing the stimulus to the DUT that should be abstracted from the rest of the agent. The driver's responsibility is to take these sequence items and provide the proper stimulus to the DUT's ports.[5]
+
+Implementation Details
+UVM driver classes are implemented as subclasses of the uvm_driver class, which itself is a subclass of uvm_component.[6]
+
+Definitions
+Agent - A container that emulates and verifies DUT devices
+Blocking - An interface that blocks tasks from other interfaces until it completes
+DUT - Device under test, what you are actually testing
+DUV - Device Under Verification
+Component - A portion of verification intellectual property that has interfaces and functions.
+Transactor - see component
+Verification Environment Configuration - those settings in the DUT and environment that are alterable while the simulation is running
+VIP - verification intellectual property
+UVM Macros
+UVM allows the use of Macros
+
+name	function	related to	parameters	purpose	Type of Macro
+`uvm_create	object constructor	`uvm_send	Sequence or Item	to create the object and allow user to set values via overloading or parameter passing	Sequence action macro
+`uvm_send	processor	`uvm_create	Sequence or Item	processes what is created by `uvm_create without randomization	Sequence Action Macros for Pre-Existing Sequences
+`uvm_do	processor	`uvm_create	Sequence or Item	executes class or item with randomization	Sequence action macro
